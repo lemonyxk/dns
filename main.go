@@ -188,7 +188,7 @@ func StartDNS(addr string, fn func()) {
 
 func main() {
 
-	var configFile = GetArgs([]string{"-r", "--recover"}, os.Args[1:])
+	var configFile = GetArgs([]string{"-f", "--config"}, os.Args[1:])
 	var domain = GetArgs([]string{"-d", "--domain"}, os.Args[1:])
 	var addr = GetArgs([]string{"-a", "--addr"}, os.Args[1:])
 	var dnss = GetArgs([]string{"--default"}, os.Args[1:])
