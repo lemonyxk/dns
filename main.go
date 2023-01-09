@@ -113,7 +113,7 @@ func (t *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	}
 
 	var err error
-	var res = &dns.Msg{}
+	var res *dns.Msg
 	var qes = (&dns.Msg{}).SetQuestion(domain, tp)
 	for i := 0; i < len(defaultDNS); i++ {
 		res, err = dns.Exchange(qes, defaultDNS[i]+":53")
@@ -124,8 +124,12 @@ func (t *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		}
 	}
 
-	var rr []dns.RR
+	if res == nil {
+		doHandler(w, domain, ip, msg)
+		return
+	}
 
+	var rr []dns.RR
 	for _, i2 := range res.Answer {
 		if i2.Header().Rrtype == tp {
 			ip = i2.(*dns.A).A.String()
@@ -258,8 +262,8 @@ func main() {
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, signalList...)
 	<-signalChan
-	signal.Stop(signalChan)
 	DeleteNameServer()
+	signal.Stop(signalChan)
 }
 
 func GetArgs(flag []string, args []string) string {
@@ -315,9 +319,11 @@ func GetDefaultNDS() {
 }
 
 func AddNameServer() {
-	if runtime.GOOS == "darwin" {
+	switch runtime.GOOS {
+	case "darwin":
 		GetDefaultNDS()
 		addNameServerDarwin()
+	default:
 	}
 }
 
@@ -349,8 +355,10 @@ func addNameServerDarwin() {
 }
 
 func DeleteNameServer() {
-	if runtime.GOOS == "darwin" {
+	switch runtime.GOOS {
+	case "darwin":
 		deleteNameServerDarwin()
+	default:
 	}
 }
 
