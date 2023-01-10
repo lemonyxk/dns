@@ -8,10 +8,31 @@
 * @create: 2023-01-06 10:53
 **/
 
+// MACOS
+// get all networks:
+//      networksetup -listnetworkserviceorder
+// set dns:
+//      networksetup -setdnsservers Wi-Fi 208.67.222.222 208.67.220.220 8.8.8.8
+// default dns:
+//      /etc/resolv.conf
+//
+// MACOS
+//      all in /etc/resolver/
+//
+// LINUX
+// all in /etc/resolv.conf
+//
+// WINDOWS
+// get all networks:
+//      netsh interface show interface
+// set dns:
+//      netsh interface ipv4 add dnsservers "Ethernet" [static(default)/dhcp] 192.168.x.x index=1
+// default dns:
+// 		ipconfig/all
+
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"net"
@@ -288,27 +309,22 @@ func GetDefaultNDS() {
 
 	defer func() { _ = f.Close() }()
 
-	var lines []string
-
-	var reader = bufio.NewReader(f)
-
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			println(err.Error())
-			os.Exit(0)
-		}
-
-		lines = append(lines, line)
+	bts, err := io.ReadAll(f)
+	if err != nil {
+		println(err.Error())
+		os.Exit(0)
 	}
 
 	var arr []string
 
+	var lines = strings.Split(string(bts), "\n")
+
 	for i := 0; i < len(lines); i++ {
-		if strings.HasPrefix(lines[i], "nameserver") {
+		if strings.TrimSpace(lines[i]) == "" {
+			continue
+		}
+
+		if lines[i][0] != '#' && strings.Contains(lines[i], "nameserver") {
 			arr = append(arr, strings.TrimSpace(strings.ReplaceAll(lines[i], "nameserver", "")))
 		}
 	}
