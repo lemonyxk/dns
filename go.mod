@@ -1,4 +1,4 @@
-module dns
+module github.com/lemonyxk/dns
 
 go 1.19
 
