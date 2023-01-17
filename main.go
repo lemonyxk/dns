@@ -170,7 +170,7 @@ func (t *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 }
 
 func doHandler(w dns.ResponseWriter, domain, ip string, msg *dns.Msg) {
-	println("domain:", domain[0:len(domain)-1], "ip:", ip)
+	println(domain[0:len(domain)-1], "from:", w.RemoteAddr().String(), "to:", ip)
 	err := w.WriteMsg(msg)
 	if err != nil {
 		println(err.Error())
