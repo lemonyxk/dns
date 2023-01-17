@@ -345,6 +345,9 @@ func AddNameServer() {
 
 func addNameServerDarwin() {
 	var fn = func(domain, ip string) {
+
+		_ = os.MkdirAll(`/etc/resolver`, 0755)
+
 		str := fmt.Sprintf("domain %s\nnameserver %s", domain, ip)
 		name := `/etc/resolver/` + domain + `.local`
 		f, err := os.OpenFile(name, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0755)
